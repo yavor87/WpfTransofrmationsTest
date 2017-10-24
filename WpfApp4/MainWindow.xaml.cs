@@ -58,41 +58,6 @@ namespace WpfApp4
                 transformMatrix.TranslatePrepend(offset.X, offset.Y);
             }
 
-            double angle = GetChildren().First().GetRotation();
-            SetSelectionAngle(0);
-
-            foreach (var child in GetChildren())
-            {
-                Rect childBounds = child.GetBounds();
-                Rect updatedBounds = Rect.Transform(childBounds, transformMatrix);
-                child.SetBounds(updatedBounds);
-            }
-
-            SetSelectionAngle(angle);
-
-            Rect newSelectionBounds = ComputeSelectionBounds();
-            this.selection.SetBounds(newSelectionBounds);
-            _manipulationCount++;
-        }
-
-        private void SetSelectionBounds2(Rect newBounds)
-        {
-            Rect currentBounds = this.selection.GetBounds();
-            Matrix transformMatrix = Matrix.Identity;
-            if (!AreClose(newBounds.Width, currentBounds.Width) || !AreClose(newBounds.Height, currentBounds.Height))
-            {
-                double scaleX = newBounds.Width / currentBounds.Width;
-                double scaleY = newBounds.Height / currentBounds.Height;
-                System.Diagnostics.Debug.WriteLine("#{0}: Scaling selection X:{1:N2} Y:{2:N2}", _manipulationCount, scaleX, scaleY);
-                transformMatrix.ScaleAtPrepend(scaleX, scaleY, newBounds.X, newBounds.Y);
-            }
-            if (!AreClose(newBounds.X, currentBounds.X) || !AreClose(newBounds.Y, currentBounds.Y))
-            {
-                Vector offset = newBounds.Location - currentBounds.Location;
-                System.Diagnostics.Debug.WriteLine("#{0}: Moving selection with vector {1}", _manipulationCount, offset);
-                transformMatrix.TranslatePrepend(offset.X, offset.Y);
-            }
-
             Point currentPivotPoint = currentBounds.Center();
             Point newPivotPoint = newBounds.Center();
             foreach (var child in GetChildren())
