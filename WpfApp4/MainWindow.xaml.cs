@@ -60,12 +60,26 @@ namespace WpfApp4
 
             foreach (var child in GetChildren())
             {
-                Rect childBounds = child.GetBounds();
-                Rect updatedBounds = Rect.Transform(childBounds, transformMatrix);
-                child.SetBounds(updatedBounds);
+                double childAngle = child.GetRotation();
+                Rect finalBounds;
+                if (childAngle != 0)
+                {
+                    // Transform child bounds to be in 0 rotation
+                    Rect childBounds = RotateBounds(child.GetBounds(), -childAngle, currentBounds.Center());
+                    // Apply translation
+                    Rect updatedBounds = Rect.Transform(childBounds, transformMatrix);
+                    // Rotate child to the desired angle again
+                    finalBounds = RotateBounds(updatedBounds, childAngle, newBounds.Center());
+                }
+                else
+                {
+                    finalBounds = Rect.Transform(child.GetBounds(), transformMatrix);
+                }
+                child.SetBounds(finalBounds);
             }
 
-            this.selection.SetBounds(newBounds);
+            Rect newSelectionBounds = ComputeSelectionBounds();
+            this.selection.SetBounds(newSelectionBounds);
             _manipulationCount++;
         }
 
@@ -87,22 +101,29 @@ namespace WpfApp4
                     continue;
 
                 Rect childBounds = child.GetBounds();
-                var childCenter = childBounds.Center();
-                var rotatedChildPivot = childCenter.Rotate(pivotPoint, delta);
-                if (rotatedChildPivot != childCenter)
-                {
-                    double newX = Math.Round(rotatedChildPivot.X - (childBounds.Width / 2), 4);
-                    double newY = Math.Round(rotatedChildPivot.Y - (childBounds.Height / 2), 4);
-
-                    Rect updatedBounds = new Rect(new Point(newX, newY), childBounds.Size);
-                    child.SetBounds(updatedBounds);
-                }
+                Rect updatedBounds = RotateBounds(childBounds, newAngle, pivotPoint);
+                child.SetBounds(updatedBounds);
                 child.SetRotation(newAngle);
             }
 
             Rect newSelectionBounds = ComputeSelectionBounds();
             this.selection.SetBounds(newSelectionBounds);
             _manipulationCount++;
+        }
+
+        private Rect RotateBounds(Rect childBounds, double angle, Point pivotPoint)
+        {
+            var childCenter = childBounds.Center();
+            var rotatedChildPivot = childCenter.Rotate(pivotPoint, angle);
+            if (rotatedChildPivot != childCenter)
+            {
+                double newX = Math.Round(rotatedChildPivot.X - (childBounds.Width / 2), 4);
+                double newY = Math.Round(rotatedChildPivot.Y - (childBounds.Height / 2), 4);
+
+                Rect updatedBounds = new Rect(new Point(newX, newY), childBounds.Size);
+                return updatedBounds;
+            }
+            return childBounds;
         }
 
         private static bool AreClose(double op1, double op2, double delta = 0.0000000000001)
