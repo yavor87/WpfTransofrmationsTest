@@ -17,6 +17,8 @@ namespace WpfApp4
             InitializeComponent();
         }
 
+        private int _manipulationCount;
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             double newSX = Double.Parse(this.tbSX.Text, System.Globalization.CultureInfo.InvariantCulture);
@@ -46,13 +48,13 @@ namespace WpfApp4
             {
                 double scaleX = newBounds.Width / currentBounds.Width;
                 double scaleY = newBounds.Height / currentBounds.Height;
-                System.Diagnostics.Debug.WriteLine("Scaling selection X:{0:N2} Y:{1:N2}", scaleX, scaleY);
+                System.Diagnostics.Debug.WriteLine("#{0}: Scaling selection X:{1:N2} Y:{2:N2}", _manipulationCount, scaleX, scaleY);
                 transformMatrix.ScaleAtPrepend(scaleX, scaleY, newBounds.X, newBounds.Y);
             }
             if (!AreClose(newBounds.X, currentBounds.X) || !AreClose(newBounds.Y, currentBounds.Y))
             {
                 Vector offset = newBounds.Location - currentBounds.Location;
-                System.Diagnostics.Debug.WriteLine("Moving selection with vector {0}", offset);
+                System.Diagnostics.Debug.WriteLine("#{0}: Moving selection with vector {1}", _manipulationCount, offset);
                 transformMatrix.TranslatePrepend(offset.X, offset.Y);
             }
 
@@ -64,6 +66,7 @@ namespace WpfApp4
             }
 
             this.selection.SetBounds(newBounds);
+            _manipulationCount++;
         }
 
         /// <summary>
@@ -75,7 +78,7 @@ namespace WpfApp4
             Rect currentBounds = this.selection.GetBounds();
             Point pivotPoint = currentBounds.Center();
 
-            System.Diagnostics.Debug.WriteLine("Rotating at angle {0:N2}", newAngle);
+            System.Diagnostics.Debug.WriteLine("#{0}: Rotating at angle {1:N2}", _manipulationCount, newAngle);
 
             foreach (var child in GetChildren())
             {
@@ -99,6 +102,7 @@ namespace WpfApp4
 
             Rect newSelectionBounds = ComputeSelectionBounds();
             this.selection.SetBounds(newSelectionBounds);
+            _manipulationCount++;
         }
 
         private static bool AreClose(double op1, double op2, double delta = 0.0000000000001)
