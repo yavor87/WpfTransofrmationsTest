@@ -58,23 +58,54 @@ namespace WpfApp4
                 transformMatrix.TranslatePrepend(offset.X, offset.Y);
             }
 
+            double angle = GetChildren().First().GetRotation();
+            SetSelectionAngle(0);
+
             foreach (var child in GetChildren())
             {
-                double childAngle = child.GetRotation();
-                Rect finalBounds;
-                if (childAngle != 0)
-                {
-                    // Transform child bounds to be in 0 rotation
-                    Rect childBounds = RotateBounds(child.GetBounds(), -childAngle, currentBounds.Center());
-                    // Apply translation
-                    Rect updatedBounds = Rect.Transform(childBounds, transformMatrix);
-                    // Rotate child to the desired angle again
-                    finalBounds = RotateBounds(updatedBounds, childAngle, newBounds.Center());
-                }
-                else
-                {
-                    finalBounds = Rect.Transform(child.GetBounds(), transformMatrix);
-                }
+                Rect childBounds = child.GetBounds();
+                Rect updatedBounds = Rect.Transform(childBounds, transformMatrix);
+                child.SetBounds(updatedBounds);
+            }
+
+            SetSelectionAngle(angle);
+
+            Rect newSelectionBounds = ComputeSelectionBounds();
+            this.selection.SetBounds(newSelectionBounds);
+            _manipulationCount++;
+        }
+
+        private void SetSelectionBounds2(Rect newBounds)
+        {
+            Rect currentBounds = this.selection.GetBounds();
+            Matrix transformMatrix = Matrix.Identity;
+            if (!AreClose(newBounds.Width, currentBounds.Width) || !AreClose(newBounds.Height, currentBounds.Height))
+            {
+                double scaleX = newBounds.Width / currentBounds.Width;
+                double scaleY = newBounds.Height / currentBounds.Height;
+                System.Diagnostics.Debug.WriteLine("#{0}: Scaling selection X:{1:N2} Y:{2:N2}", _manipulationCount, scaleX, scaleY);
+                transformMatrix.ScaleAtPrepend(scaleX, scaleY, newBounds.X, newBounds.Y);
+            }
+            if (!AreClose(newBounds.X, currentBounds.X) || !AreClose(newBounds.Y, currentBounds.Y))
+            {
+                Vector offset = newBounds.Location - currentBounds.Location;
+                System.Diagnostics.Debug.WriteLine("#{0}: Moving selection with vector {1}", _manipulationCount, offset);
+                transformMatrix.TranslatePrepend(offset.X, offset.Y);
+            }
+
+            Point currentPivotPoint = currentBounds.Center();
+            Point newPivotPoint = newBounds.Center();
+            foreach (var child in GetChildren())
+            {
+                double angle = child.GetRotation();
+                Rect childBounds = child.GetBounds();
+
+                // Transform child bounds to be in 0 rotation
+                Rect normalizedBoudns = RotateBounds(childBounds, -angle, currentPivotPoint);
+                // Apply translation
+                Rect translatedBounds = Rect.Transform(normalizedBoudns, transformMatrix);
+                // Rotate child to the desired angle
+                Rect finalBounds = RotateBounds(translatedBounds, angle, newPivotPoint);
                 child.SetBounds(finalBounds);
             }
 
