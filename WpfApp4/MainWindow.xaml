@@ -31,11 +31,11 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="X" VerticalAlignment="Center" />
                     <TextBox x:Name="tbSX" Width="100" Margin="3"
-                             Text="{Binding ElementName=selection, Path=(Canvas.Left), Mode=OneWay}" />
+                             Text="{Binding ElementName=selection, Path=(Canvas.Left), Mode=OneWay, StringFormat={}{0:N2}}" />
 
                     <TextBlock Text="Y" VerticalAlignment="Center" />
                     <TextBox x:Name="tbSY" Width="100" Margin="3"
-                             Text="{Binding ElementName=selection, Path=(Canvas.Top), Mode=OneWay}"/>
+                             Text="{Binding ElementName=selection, Path=(Canvas.Top), Mode=OneWay, StringFormat={}{0:N2}}"/>
                 </StackPanel>
             </GroupBox>
 
@@ -44,7 +44,7 @@
                     <TextBlock Text="X" VerticalAlignment="Center" />
                     <TextBox x:Name="tbEX" Width="100" Margin="3">
                         <TextBox.Text>
-                            <MultiBinding Converter="{StaticResource sumConverter}" Mode="OneWay">
+                            <MultiBinding Converter="{StaticResource sumConverter}" Mode="OneWay" StringFormat="{}{0:N2}">
                                 <Binding ElementName="selection" Path="(Canvas.Left)" />
                                 <Binding ElementName="selection" Path="Width" />
                             </MultiBinding>
@@ -54,7 +54,7 @@
                     <TextBlock Text="Y" VerticalAlignment="Center" />
                     <TextBox x:Name="tbEY" Width="100" Margin="3">
                         <TextBox.Text>
-                            <MultiBinding Converter="{StaticResource sumConverter}" Mode="OneWay">
+                            <MultiBinding Converter="{StaticResource sumConverter}" Mode="OneWay" StringFormat="{}{0:N2}">
                                 <Binding ElementName="selection" Path="(Canvas.Top)" />
                                 <Binding ElementName="selection" Path="Height" />
                             </MultiBinding>
