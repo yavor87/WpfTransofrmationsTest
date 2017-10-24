@@ -101,7 +101,7 @@ namespace WpfApp4
                     continue;
 
                 Rect childBounds = child.GetBounds();
-                Rect updatedBounds = RotateBounds(childBounds, newAngle, pivotPoint);
+                Rect updatedBounds = RotateBounds(childBounds, delta, pivotPoint);
                 child.SetBounds(updatedBounds);
                 child.SetRotation(newAngle);
             }
@@ -111,19 +111,19 @@ namespace WpfApp4
             _manipulationCount++;
         }
 
-        private Rect RotateBounds(Rect childBounds, double angle, Point pivotPoint)
+        private Rect RotateBounds(Rect bounds, double delta, Point pivotPoint)
         {
-            var childCenter = childBounds.Center();
-            var rotatedChildPivot = childCenter.Rotate(pivotPoint, angle);
+            var childCenter = bounds.Center();
+            var rotatedChildPivot = childCenter.Rotate(pivotPoint, delta);
             if (rotatedChildPivot != childCenter)
             {
-                double newX = Math.Round(rotatedChildPivot.X - (childBounds.Width / 2), 4);
-                double newY = Math.Round(rotatedChildPivot.Y - (childBounds.Height / 2), 4);
+                double newX = Math.Round(rotatedChildPivot.X - (bounds.Width / 2), 4);
+                double newY = Math.Round(rotatedChildPivot.Y - (bounds.Height / 2), 4);
 
-                Rect updatedBounds = new Rect(new Point(newX, newY), childBounds.Size);
+                Rect updatedBounds = new Rect(new Point(newX, newY), bounds.Size);
                 return updatedBounds;
             }
-            return childBounds;
+            return bounds;
         }
 
         private static bool AreClose(double op1, double op2, double delta = 0.0000000000001)
