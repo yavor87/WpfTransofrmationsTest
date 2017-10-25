@@ -74,8 +74,7 @@ namespace WpfApp4
                 child.SetBounds(finalBounds);
             }
 
-            Rect newSelectionBounds = ComputeSelectionBounds();
-            this.selection.SetBounds(newSelectionBounds);
+            this.selection.SetBounds(newBounds);
             _manipulationCount++;
         }
 
