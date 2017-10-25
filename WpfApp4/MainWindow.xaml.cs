@@ -65,12 +65,20 @@ namespace WpfApp4
                 double angle = child.GetRotation();
                 Rect childBounds = child.GetBounds();
 
-                // Transform child bounds to be in 0 rotation
-                Rect normalizedBoudns = RotateBounds(childBounds, -angle, currentPivotPoint);
-                // Apply translation
-                Rect translatedBounds = Rect.Transform(normalizedBoudns, transformMatrix);
-                // Rotate child to the desired angle
-                Rect finalBounds = RotateBounds(translatedBounds, angle, newPivotPoint);
+                Rect finalBounds;
+                if (angle == 0)
+                {
+                    finalBounds = Rect.Transform(childBounds, transformMatrix);
+                }
+                else
+                {
+                    // Transform child bounds to be in 0 rotation
+                    Rect normalizedBoudns = RotateBounds(childBounds, -angle, currentPivotPoint);
+                    // Apply translation
+                    Rect translatedBounds = Rect.Transform(normalizedBoudns, transformMatrix);
+                    // Rotate child to the desired angle
+                    finalBounds = RotateBounds(translatedBounds, angle, newPivotPoint);
+                }
                 child.SetBounds(finalBounds);
             }
 
