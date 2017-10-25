@@ -129,6 +129,14 @@ namespace WpfApp4
             return bounds;
         }
 
+        private static Point TranslateOrigin(Rect bounds, Point origin)
+        {
+            Point newOrigin = new Point(bounds.Width / 2, bounds.Height / 2);
+            Vector offset = origin - bounds.Center();
+            newOrigin.Offset(offset.X, offset.Y);
+            return newOrigin;
+        }
+
         private static bool AreClose(double op1, double op2, double delta = 0.0000000000001)
         {
             return Math.Abs(op2 - op1) < delta;
